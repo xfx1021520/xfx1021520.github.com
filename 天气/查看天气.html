@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>查看天气</title>
+    <style>
+        #container{
+            width: 300px;
+            height: 500px;
+            background-color: lightgreen;
+            position: relative;
+            margin: 10px auto;
+            overflow-x: hidden;
+            overflow-y: scroll;
+        }
+        #container select{
+            height: 30px;
+            margin-left: 80px;
+            margin-top: 8px;
+        }
+        #info div{
+            width: 300px;
+            background-color: cyan;
+            border-bottom: 1px solid red;
+        }
+
+        #info ul{
+            list-style: none;
+        }
+
+    </style>
+</head>
+<body>
+<div id="container">
+    <select name="" id="city">
+        <option value="hangzhou">杭州</option>
+        <option value="beijing">北京</option>
+        <option value="shanghai">上海</option>
+        <option value="chengdu">成都</option>
+        <option value="shenzhen">深圳</option>
+        <option value="guiyang">贵阳</option>
+    </select>
+    <input type="button" value="查看天气" id="btn">
+    <div id="info"></div>
+</div>
+
+<script src="jquery-3.1.1.min.js"></script>
+
+<script>
+    $(function(){
+        $('#btn').click(function(){
+            //alert('成功');
+            //点击之前把上一次的元素都清空
+            $('#info').html('');
+            //获取当前被选中的option value值，作为api中city属性值
+            var cityId = $('#city').val();
+            //console.log(cityId);
+            //利用ajax获取开源api的数据
+            $.ajax({
+                type:'get',
+                url:'https://free-api.heweather.com/v5/forecast',
+                async:true,
+                data:{
+                    key:'fc72061435b84eafaa487adde39c0d43',
+                    city:cityId
+                },
+                success:function(data){
+                    console.log(data);
+                    var daily_forecast = data['HeWeather5'][0]['daily_forecast'];
+                    for (var i=0; i<daily_forecast.length; i++){
+                        var daily_obj = daily_forecast[i];
+                        var date = daily_obj['date'];
+                        var tmp_max = daily_obj['tmp']['max'];
+                        var tmp_min = daily_obj['tmp']['min'];
+                        var hum = daily_obj['hum'];
+                        var vis = daily_obj['vis'];
+                        var cond_txt_d = daily_obj['cond']['txt_d'];
+                        var cond_txt_n = daily_obj['cond']['txt_n'];
+
+                        var tag = '';
+                        tag += '<span>日期：'+date+'</span><ul>';
+                        tag += '<li>最高气温：'+tmp_max+'</li>';
+                        tag += '<li>最低气温：'+tmp_min+'</li>';
+                        tag += '<li>空气湿度：'+hum+'</li>';
+                        tag += '<li>能见度：'+vis+'</li>';
+                        tag += '<li>白天天气状况：'+cond_txt_d+'</li>';
+                        tag += '<li>夜间天气状况：'+cond_txt_n+'</li>';
+                        tag += '</ul>';
+
+                        $('#info').append($('<div>').append(tag));
+                    }
+                }
+            })
+        })
+    })
+</script>
+
+</body>
+</html>
